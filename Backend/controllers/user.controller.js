@@ -1,5 +1,5 @@
 const userModal = require("../models/user.model");
-const BlackListTokenModel = require("../models/blackListToken.model");
+const BlacklistTokenModel = require("../models/blacklistToken.model");
 const { validationResult } = require("express-validator");
 const { createUser } = require("../services/user.service");
 
@@ -11,6 +11,11 @@ const register = async (req, res, next) => {
   }
 
   const { fullName, email, password } = req.body;
+
+  const isEmailAlreadyRegistered = await userModal.findOne({ email });
+  if (isEmailAlreadyRegistered) {
+    res.status(400).json({ error: "Email already registered." });
+  }
 
   const hashedPassword = await userModal.hashPassword(password);
 
@@ -58,7 +63,7 @@ const logout = async (req, res, next) => {
   const token =
     req?.cookies?.token || req?.headers?.authorization?.split(" ")[1];
 
-  const blackListToken = new BlackListTokenModel({ token });
+  const blackListToken = new BlacklistTokenModel({ token });
   await blackListToken.save();
 
   res.status(200).send({ message: "Logged out successfully!" });
