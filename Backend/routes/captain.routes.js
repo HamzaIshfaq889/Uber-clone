@@ -1,12 +1,17 @@
 const express = require("express");
 const router = express.Router();
-const { authVerifier } = require("../middlewares/auth.middleware");
+const { captainAuthVerifer } = require("../middlewares/auth.middleware");
+const uploadMiddleware = require("../middlewares/upload.middleware");
 const { body } = require("express-validator");
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 
 const {
   register,
   login,
   logout,
+  getCaptainProfile,
+  uploadFiles,
 } = require("../controllers/captain.controller");
 
 router.post(
@@ -42,6 +47,10 @@ router.post(
   login
 );
 
-router.get("/logout", authVerifier, logout);
+router.get("/logout", captainAuthVerifer, logout);
+
+router.get("/profile", captainAuthVerifer, getCaptainProfile);
+
+router.post("/upload", uploadMiddleware.array("images"), uploadFiles);
 
 module.exports = router;

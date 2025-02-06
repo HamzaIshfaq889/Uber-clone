@@ -1,22 +1,67 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import FindTripC from "../FindTrip";
+import NearbyRidesC from "../NearbyRides";
+import DriverLookupC from "../DriverLookup";
+import SelectedDriverC from "../SelectedDriver";
 
 const HomeC = () => {
-  return (
-    <div>
-      <div className="relative h-screen bg-cover bg-center bg-[url(https://images.unsplash.com/photo-1614091199036-e934784dbf0f?q=80&w=1888&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D)]">
-        <h2 className="p-4 text-4xl text-white">Uber</h2>
-      </div>
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedSuggestion, setSelectedSuggestion] = useState("");
+  const [selectedRide, setSelectedRide] = useState("");
+  const [SelectedDriver, setSelectedDriver] = useState(false);
 
-      <div className="absolute w-full bottom-0 bg-white pb-7 py-4 px-4">
-        <h2 className="text-3xl font-bold">Get Started with Uber</h2>
-        <Link
-          to="/login"
-          className="flex items-center justify-center w-full bg-black text-white py-3 rounded-lg mt-4"
+  return (
+    <div className="relative w-screen h-screen bg-center bg-cover bg-[url(https://media.wired.com/photos/59269cd37034dc5f91bec0f1/master/pass/GoogleMapTA.jpg)]">
+      <h2 className="p-4 text-4xl text-black">Uber</h2>
+
+      {!selectedSuggestion && !selectedRide ? (
+        <div
+          className={`px-4 py-8 bg-white w-full absolute  ${
+            showSuggestions ? "top-0 h-screen" : "bottom-0 rounded-t-3xl"
+          }`}
         >
-          Sign Up to Ride
-        </Link>
-      </div>
+          <FindTripC
+            setShowSuggestions={setShowSuggestions}
+            showSuggestions={showSuggestions}
+            setSelectedSuggestion={setSelectedSuggestion}
+          />
+        </div>
+      ) : null}
+
+      {selectedSuggestion && !selectedRide ? (
+        <div
+          className={`px-4 py-8 bg-white w-full absolute  ${
+            showSuggestions ? "top-0 h-screen" : "bottom-0 rounded-t-3xl"
+          }`}
+        >
+          <NearbyRidesC
+            selectedSuggestion={selectedSuggestion}
+            setShowSuggestions={setShowSuggestions}
+            setSelectedSuggestion={setSelectedSuggestion}
+            setSelectedRide={setSelectedRide}
+          />
+        </div>
+      ) : null}
+
+      {selectedRide ? (
+        <div
+          className={`px-4 py-8 bg-white w-full absolute  ${
+            showSuggestions ? "top-0 h-screen" : "bottom-0 rounded-t-3xl"
+          }`}
+        >
+          <DriverLookupC setSelectedRide={setSelectedRide} />
+        </div>
+      ) : null}
+
+      {SelectedDriver ? (
+        <div
+          className={`px-4 py-8 bg-white w-full absolute  ${
+            showSuggestions ? "top-0 h-screen" : "bottom-0 rounded-t-3xl"
+          }`}
+        >
+          <SelectedDriverC setSelectedDriver={setSelectedDriver} />
+        </div>
+      ) : null}
     </div>
   );
 };

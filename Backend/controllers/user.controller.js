@@ -13,8 +13,9 @@ const register = async (req, res, next) => {
   const { fullName, email, password } = req.body;
 
   const isEmailAlreadyRegistered = await userModal.findOne({ email });
+  console.log(isEmailAlreadyRegistered);
   if (isEmailAlreadyRegistered) {
-    res.status(400).json({ error: "Email already registered." });
+    return res.status(400).json({ error: "Email already registered." });
   }
 
   const hashedPassword = await userModal.hashPassword(password);
@@ -47,7 +48,7 @@ const login = async (req, res, next) => {
 
   const isPasswordValid = await user.comparePassword(password);
   if (!isPasswordValid) {
-    return res.status(401).send({ message: "Invalid Credentials" });
+    return res.status(404).send({ message: "Invalid Credentials" });
   }
 
   const token = user.generateAuthToken();

@@ -1,13 +1,52 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import useStore from "../../zustand/store";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const UserLoginC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const { setUser } = useStore();
+  const navigate = useNavigate();
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    console.log(email, password);
+    const userData = {
+      email,
+      password,
+    };
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/user/login`,
+        userData
+      );
+
+      if (response.status === 200) {
+        const { user, token } = response.data;
+        setUser(user);
+        localStorage.setItem("token", token);
+
+        navigate("/home");
+        toast.success("Login successful!");
+      }
+    } catch (error) {
+      console.log(error);
+      if (error?.response) {
+        if (error?.response?.status === 404) {
+          toast.error(error?.response?.data?.message || "Invalid Credentials");
+        } else if (error?.response?.status === 400) {
+          toast.error(
+            error?.response?.data?.message || "Please provide valid values."
+          );
+        } else if (error?.response?.status === 500) {
+          toast.error("Server Error");
+        }
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    }
   };
 
   return (

@@ -8,7 +8,7 @@ const register = async (req, res, next) => {
     const errors = validationResult(req);
 
     if (!errors?.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ error: errors.array() });
     }
 
     const { fullName, email, password, socketId, status, vehicle, location } =
@@ -16,7 +16,7 @@ const register = async (req, res, next) => {
 
     const isEmailAlreadyRegistered = await captainModel.findOne({ email });
     if (isEmailAlreadyRegistered) {
-      res.status(400).json({ error: "Email already registered." });
+      return res.status(400).json({ error: "Email already registered." });
     }
 
     const hashedPassword = await captainModel.hashPassword(password);
@@ -44,7 +44,7 @@ const login = async (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json({ error: errors.array() });
   }
 
   const { email, password } = req.body;
@@ -73,4 +73,19 @@ const logout = async (req, res, next) => {
   res.status(200).json({ message: "Logout successfully." });
 };
 
-module.exports = { register, login, logout };
+const getCaptainProfile = async (req, res, next) => {
+  res.status(200).json({ captain: req.captain });
+};
+
+const uploadFiles = async (req, res, next) => {
+  if (!req?.files) {
+    return res.status(400).json({ message: "No files uploaded" });
+  }
+
+  const filePaths = req.files.map((file) => file.path);
+  res
+    .status(200)
+    .json({ message: "Images uploaded successfully", files: filePaths });
+};
+
+module.exports = { register, login, logout, getCaptainProfile, uploadFiles };

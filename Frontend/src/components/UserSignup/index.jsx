@@ -1,16 +1,47 @@
 import React, { useState } from "react";
+import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const UserSignupC = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    console.log(firstName, lastName, email, password);
+
+    const payload = {
+      fullName: {
+        firstName,
+        lastName,
+      },
+      email,
+      password,
+    };
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/user/register`,
+        payload
+      );
+
+      if (!response.status === 201) {
+        toast("Something went wrong. Please try again!");
+        return;
+      }
+
+      toast("Signup Succesfully.");
+      navigate("/login");
+    } catch (error) {
+      toast(error?.response?.data?.error);
+      console.log(error);
+    }
   };
+
   return (
     <div>
       <div className="p-7 h-screen flex flex-col justify-between">

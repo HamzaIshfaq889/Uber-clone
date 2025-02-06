@@ -1,13 +1,52 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import useStore from "../../zustand/store";
 
 const CaptainLoginC = () => {
+  const navigate = useNavigate();
+  const { setCaptain, captain } = useStore();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const submitHandler = (e) => {
+  const submitHandler = async (e) => {
     e.preventDefault();
-    console.log(email, password);
+
+    const captainData = {
+      email,
+      password,
+    };
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/captain/login`,
+        captainData
+      );
+
+      if (response.status === 200) {
+        const { token, captain } = response?.data;
+
+        setCaptain(captain);
+        localStorage.setItem("token", token);
+
+        toast("Login Successfull.");
+        navigate("/captain-home");
+      }
+    } catch (error) {
+      if (error?.response?.status === 404) {
+        toast.error(error?.response?.data?.error || "Invalid Credentials.");
+      } else if (error?.response?.status === 400) {
+        toast.error(
+          error?.response?.data?.error || "Please provide valid values."
+        );
+      } else if (error?.response?.status === 500) {
+        toast.error("Server Error");
+      } else {
+        toast.error("An unexpected error occurred.");
+      }
+    }
   };
   return (
     <div className="p-7 h-screen flex flex-col justify-between">
